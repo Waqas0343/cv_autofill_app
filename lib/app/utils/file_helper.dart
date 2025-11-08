@@ -69,35 +69,109 @@ Map<String, String> parseCVData(String rawText) {
 
   String clean(String s) => s.replaceAll(RegExp(r'[^\w\s\@\.\-\+\/\:]'), '').trim();
 
-  String name = '';
   final addressKeywords = [
     'pakistan','lahore','karachi','islamabad','rawalpindi','faisalabad','multan','peshawar','quetta','gujranwala','sialkot'
   ];
 
-  for (int i = 0; i < lines.length && i < 8; i++) {
+  final companyKeywords = [
+    'company','solutions','digital','inc','llc','tech','limited','private','studio','media','creative'
+  ];
+
+  String name = '';
+  String company = '';
+
+  // ===== 1. Company Detection =====
+  for (int i = 0; i < lines.length && i < 5; i++) {
     String line = clean(lines[i]);
+    if (line.isEmpty) continue;
+    if (companyKeywords.any((kw) => line.toLowerCase().contains(kw))) {
+      company = line;
+      break;
+    }
+  }
 
-    if (line.length < 3 || line.length > 60) continue;
-    if (line.contains('@') || line.contains('linkedin') || line.contains('http') || line.contains('/in/')) continue;
-    if (RegExp(r'\d{2,}').hasMatch(line)) continue;
-    if (line.toLowerCase().contains('resume') || line.toLowerCase().contains('cv')) continue;
-    if (addressKeywords.any((kw) => line.toLowerCase().contains(kw))) continue;
+  // ===== 2. User Name Detection =====
+  int linkedInIndex = -1;
+  for (int i = 0; i < lines.length; i++) {
+    String l = lines[i].toLowerCase();
+    if (l.contains('linkedin.com/in/') || l.contains('/in/')) {
+      linkedInIndex = i;
+      break;
+    }
+  }
 
-    final words = line.split(' ');
-    if (words.length >= 2 && words.length <= 5) {
-      int caps = words.where((w) => w.isNotEmpty && w[0] == w[0].toUpperCase()).length;
-      if (caps >= words.length - 1 || line.split(' ').every((w) => w.length > 2)) {
-        name = line;
-        break;
+  // Check 2 lines above LinkedIn
+  if (linkedInIndex != -1) {
+    for (int offset = 1; offset <= 2; offset++) {
+      int idx = linkedInIndex - offset;
+      if (idx >= 0) {
+        String line = clean(lines[idx]);
+        if (line.isNotEmpty &&
+            !line.contains('@') &&
+            !line.contains('http') &&
+            !line.contains('/in/') &&
+            !companyKeywords.any((kw) => line.toLowerCase().contains(kw)) &&
+            !addressKeywords.any((kw) => line.toLowerCase().contains(kw)) &&
+            line.split(' ').length >= 2 &&
+            line.split(' ').length <= 4) {
+          name = line;
+          break;
+        }
       }
     }
   }
 
-  data['name'] = name.isEmpty ? 'Name Not Found' : name;
+  // Fallback: top lines, ignore company keywords
+  if (name.isEmpty) {
+    for (int i = 0; i < lines.length && i < 8; i++) {
+      String line = clean(lines[i]);
+      if (line.isEmpty) continue;
+      if (line.contains('@') || line.contains('linkedin') || line.contains('http') || line.contains('/in/')) continue;
+      if (company.isNotEmpty && line == company) continue;
+      if (addressKeywords.any((kw) => line.toLowerCase().contains(kw))) continue;
 
+      final words = line.split(' ');
+      if (words.length >= 2 && words.length <= 4) {
+        int caps = words.where((w) => w.isNotEmpty && w[0] == w[0].toUpperCase()).length;
+        if (caps >= words.length - 1) {
+          name = line;
+          break;
+        }
+      }
+    }
+  }
+
+  String extractNameFromEmailOrLinkedIn(String email, String linkedin) {
+    if (email.isNotEmpty) {
+      String firstPart = email.split('@').first;
+      firstPart = firstPart.replaceAll(RegExp(r'[\d\._\-]'), ' ').trim();
+      List<String> words = firstPart
+          .split(' ')
+          .where((w) => w.isNotEmpty)
+          .map((w) => w[0].toUpperCase() + w.substring(1))
+          .toList();
+      return words.join(' ').trim();
+    }
+    if (linkedin.isNotEmpty) {
+      String username = linkedin.split('/').last;
+      username = username.replaceAll(RegExp(r'[\d\-_]'), ' ').trim();
+      List<String> words = username
+          .split(' ')
+          .where((w) => w.isNotEmpty)
+          .map((w) => w[0].toUpperCase() + w.substring(1))
+          .toList();
+      return words.join(' ').trim();
+    }
+    return 'Name Not Found';
+  }
+
+  data['name'] = name.isEmpty ? 'Name Not Found' : name;
+  data['company'] = company.isEmpty ? 'Company Not Found' : company;
+
+  // ===== 3. Position =====
   String position = '';
-  if (name != 'Name Not Found' && name.isNotEmpty) {
-    int nameIndex = lines.indexWhere((l) => clean(l).contains(name.split(' ').first));
+  if (data['name'] != 'Name Not Found' && data['name']!.isNotEmpty) {
+    int nameIndex = lines.indexWhere((l) => clean(l).contains(data['name']!.split(' ').first));
     if (nameIndex != -1 && nameIndex + 1 < lines.length) {
       String next = clean(lines[nameIndex + 1]);
       if (next.contains('/in/') || next.contains('linkedin') || next.contains('http')) {
@@ -111,7 +185,6 @@ Map<String, String> parseCVData(String rawText) {
       }
     }
   }
-
   if (position.isEmpty) {
     for (String line in lines) {
       String cl = clean(line);
@@ -123,7 +196,7 @@ Map<String, String> parseCVData(String rawText) {
   }
   data['position'] = position;
 
-  // ==================== 3. LINKEDIN ====================
+  // ===== 4. LinkedIn =====
   final patterns = [
     RegExp(r'https?://(www\.)?linkedin\.com/in/[\w\-]+', caseSensitive: false),
     RegExp(r'linkedin\.com/in/[\w\-]+', caseSensitive: false),
@@ -145,7 +218,12 @@ Map<String, String> parseCVData(String rawText) {
   }
   data['linkedin'] = linkedin;
 
-  // ==================== 4. EMAIL & PHONE ====================
+  // ===== Apply fallback if name not found =====
+  if (data['name'] == 'Name Not Found') {
+    data['name'] = extractNameFromEmailOrLinkedIn(data['email'] ?? '', data['linkedin'] ?? '');
+  }
+
+  // ===== 5. Email & Phone =====
   final emailMatch = RegExp(r'[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}').firstMatch(text);
   data['email'] = emailMatch?.group(0) ?? '';
 
@@ -158,7 +236,7 @@ Map<String, String> parseCVData(String rawText) {
   }
   data['phone'] = phone;
 
-  // ==================== 5. ADDRESS ====================
+  // ===== 6. Address =====
   final cities = ['karachi','lahore','islamabad','rawalpindi','faisalabad','multan','peshawar','quetta','gujranwala','sialkot'];
   for (String line in lines) {
     if (cities.any((c) => line.toLowerCase().contains(c))) {
@@ -167,7 +245,7 @@ Map<String, String> parseCVData(String rawText) {
     }
   }
 
-  // ==================== 6. EDUCATION ====================
+  // ===== 7. Education =====
   final eduPattern = RegExp(r'\b(b\.?s\.?|m\.?s\.?|bachelor|master|bsc|msc|mba|ph\.?d|b\.?tech|m\.?tech|be|me|physics)\b', caseSensitive: false);
   for (String line in lines) {
     if (eduPattern.hasMatch(line)) {
@@ -176,10 +254,10 @@ Map<String, String> parseCVData(String rawText) {
     }
   }
 
-  // ==================== FINAL DEBUG ====================
   print("\n" + "="*80);
-  print("100% FINAL FIXED — NAME DETECTION ROBUST:");
+  print("USER & COMPANY EXTRACTION:");
   print("Name      → '${data['name']}'");
+  print("Company   → '${data['company']}'");
   print("Position  → '${data['position']}'");
   print("LinkedIn  → '${data['linkedin']}'");
   print("Email     → '${data['email']}'");
@@ -190,6 +268,9 @@ Map<String, String> parseCVData(String rawText) {
 
   return data;
 }
+
+
+
 
 
 
