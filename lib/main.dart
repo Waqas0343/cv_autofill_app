@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'app/routes/app_routes.dart';
 import 'app/screens/cv_form_screen.dart';
+import 'app/screens/splash.dart';
 
 void main() {
   runApp(const CVApp());
@@ -15,9 +16,9 @@ class CVApp extends StatelessWidget {
     return GetMaterialApp(
       title: "CV Auto Fill App",
       debugShowCheckedModeBanner: false,
-      initialRoute: AppRoutes.cvForm,
+      initialRoute: AppRoutes.splash,
       getPages: [
-        GetPage(name: AppRoutes.cvForm, page: () => CVFormScreen()),
+        GetPage(name: AppRoutes.splash, page: () => Splash()),
       ],
       theme: ThemeData(
         primarySwatch: Colors.blue,

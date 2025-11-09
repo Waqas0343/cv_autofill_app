@@ -4,7 +4,7 @@ import '../controllers/cv_form_controller.dart';
 import '../utils/file_helper.dart';
 
 class CVFormScreen extends StatelessWidget {
-   CVFormScreen({super.key});
+   const CVFormScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
