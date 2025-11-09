@@ -254,6 +254,58 @@ Map<String, String> parseCVData(String rawText) {
     }
   }
 
+  // ===== 8. Skills =====
+  final skillsPattern = RegExp(r'\b(skills?|technologies|tools)\b[:\-]?\s*(.*)', caseSensitive: false);
+  for (String line in lines) {
+    if (skillsPattern.hasMatch(line)) {
+      data['skills'] = line.split(':').last.trim();
+      break;
+    }
+  }
+
+// ===== 9. Experience =====
+  final expPattern = RegExp(r'\b(experience)\b', caseSensitive: false);
+  for (String line in lines) {
+    if (expPattern.hasMatch(line) && line.length < 150) {
+      data['experience'] = line;
+      break;
+    }
+  }
+
+// ===== 10. Summary / Objective =====
+  final summaryPattern = RegExp(r'\b(professional summary|summary|objective|profile)\b', caseSensitive: false);
+  for (int i = 0; i < lines.length; i++) {
+    if (summaryPattern.hasMatch(lines[i])) {
+      StringBuffer buffer = StringBuffer();
+
+      // Read next few lines as the content of summary
+      for (int j = i + 1; j < lines.length && j < i + 6; j++) {
+        String nextLine = lines[j].trim();
+        if (nextLine.isEmpty) break; // stop if blank line encountered
+        // stop if new section starts
+        if (RegExp(r'\b(skills|experience|education|projects|certifications|contact|achievements)\b', caseSensitive: false)
+            .hasMatch(nextLine)) break;
+        buffer.writeln(nextLine);
+      }
+
+      final summaryText = buffer.toString().trim();
+      if (summaryText.isNotEmpty) {
+        data['summary'] = summaryText;
+      } else {
+        data['summary'] = lines[i]; // fallback (title only)
+      }
+      break;
+    }
+  }
+
+// ===== 11. Certifications =====
+  final certPattern = RegExp(r'(certificate|certified|coursera|udemy|google|meta|aws|microsoft)', caseSensitive: false);
+  List<String> certs = [];
+  for (String line in lines) {
+    if (certPattern.hasMatch(line)) certs.add(line);
+  }
+  data['certifications'] = certs.join(', ');
+
   print("\n" + "="*80);
   print("USER & COMPANY EXTRACTION:");
   print("Name      → '${data['name']}'");
@@ -264,6 +316,10 @@ Map<String, String> parseCVData(String rawText) {
   print("Phone     → '$phone'");
   print("Address   → '${data['address']}'");
   print("Education → '${data['education']}'");
+  print("Skills     → '${data['skills']}'");
+  print("Experience → '${data['experience']}'");
+  print("Summary    → '${data['summary']}'");
+  print("Certs      → '${data['certifications']}'");
   print("="*80 + "\n");
 
   return data;

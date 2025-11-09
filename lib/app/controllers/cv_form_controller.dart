@@ -10,6 +10,11 @@ class CVFormController extends GetxController {
   final TextEditingController educationController = TextEditingController();
   final TextEditingController linkedinController = TextEditingController();
 
+  final TextEditingController skillsController = TextEditingController();
+  final TextEditingController experienceController = TextEditingController();
+  final TextEditingController summaryController = TextEditingController();
+  final TextEditingController certificationsController = TextEditingController();
+
 
   void fillFields(Map<String, String> data) {
     nameController.text = data['name'] ?? '';
@@ -19,6 +24,10 @@ class CVFormController extends GetxController {
     addressController.text = data['address'] ?? '';
     educationController.text = data['education'] ?? '';
     linkedinController.text = data['linkedin'] ?? '';
+    skillsController.text = data['skills'] ?? '';
+    experienceController.text = data['experience'] ?? '';
+    summaryController.text = data['summary'] ?? '';
+    certificationsController.text = data['certifications'] ?? '';
   }
 
   @override

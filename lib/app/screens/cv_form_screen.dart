@@ -189,6 +189,103 @@ class CVFormScreen extends StatelessWidget {
               ),
             ),
             ),
+            SizedBox(height: 10),
+            TextFormField(
+              controller: controller.skillsController,
+              decoration:  InputDecoration(
+                labelText: 'Skills',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8.0),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8.0),
+                  borderSide:  BorderSide(
+                    color:  Colors.green,
+                    width: 2.0,
+                  ),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8.0),
+                  borderSide:  BorderSide(
+                    color:  Colors.green,
+                    width: 2.0,
+                  ),
+                ),
+              ),
+            ),
+            SizedBox(height: 10),
+            TextFormField(
+              controller: controller.experienceController,
+              decoration:  InputDecoration(
+                labelText: 'Experience',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8.0),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8.0),
+                  borderSide:  BorderSide(
+                    color:  Colors.green,
+                    width: 2.0,
+                  ),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8.0),
+                  borderSide:  BorderSide(
+                    color:  Colors.green,
+                    width: 2.0,
+                  ),
+                ),
+              ),
+            ),
+            SizedBox(height: 10),
+            TextFormField(
+              controller: controller.summaryController,
+              maxLines: 6,
+              decoration:  InputDecoration(
+                labelText: 'Profile Summary',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8.0),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8.0),
+                  borderSide:  BorderSide(
+                    color:  Colors.green,
+                    width: 2.0,
+                  ),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8.0),
+                  borderSide:  BorderSide(
+                    color:  Colors.green,
+                    width: 2.0,
+                  ),
+                ),
+              ),
+            ),
+            SizedBox(height: 10),
+            TextFormField(
+              controller: controller.certificationsController,
+              decoration:  InputDecoration(
+                labelText: 'Certifications',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8.0),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8.0),
+                  borderSide:  BorderSide(
+                    color:  Colors.green,
+                    width: 2.0,
+                  ),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8.0),
+                  borderSide:  BorderSide(
+                    color:  Colors.green,
+                    width: 2.0,
+                  ),
+                ),
+              ),
+            ),
             SizedBox(height: 25),
             ElevatedButton.icon(
               onPressed: () async {
