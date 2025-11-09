@@ -8,41 +8,28 @@ class Splash extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final SplashController controller = Get.put(SplashController());
-
     return Scaffold(
       body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            colors: [
-              Color(0xFF1A73E8), // blue
-              Color(0xFF0F9D58), // green
-            ],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
+        decoration: BoxDecoration(
+          color:   Color(0xFF0F9D58),
         ),
         child: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const SizedBox(height: 20),
-              ShaderMask(
-                shaderCallback: (bounds) => const LinearGradient(
-                  colors: [Colors.white, Colors.yellowAccent],
-                ).createShader(bounds),
-                child: const Text(
-                  "CV Auto Form Filling",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 1.2,
-                    color: Colors.white,
-                  ),
+               SizedBox(height: 20),
+               Text(
+                "CV Auto Form Filling",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 28,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 1.2,
+                  color: Colors.white,
                 ),
               ),
-              const SizedBox(height: 8),
-              const Text(
+               SizedBox(height: 8),
+               Text(
                 "Smart Resume Reader & Auto Form Filler",
                 style: TextStyle(
                   color: Colors.white70,
@@ -50,7 +37,7 @@ class Splash extends StatelessWidget {
                   fontStyle: FontStyle.italic,
                 ),
               ),
-              const SizedBox(
+               SizedBox(
                 height: 40,
                 width: 40,
                 child: CircularProgressIndicator(
@@ -58,9 +45,8 @@ class Splash extends StatelessWidget {
                   valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                 ),
               ),
-
-              const SizedBox(height: 16),
-              const Text(
+              SizedBox(height: 16),
+              Text(
                 "Loading your experience...",
                 style: TextStyle(color: Colors.white70, fontSize: 12),
               ),

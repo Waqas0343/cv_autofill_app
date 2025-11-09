@@ -9,7 +9,6 @@ class CVFormController extends GetxController {
   final TextEditingController addressController = TextEditingController();
   final TextEditingController educationController = TextEditingController();
   final TextEditingController linkedinController = TextEditingController();
-
   final TextEditingController skillsController = TextEditingController();
   final TextEditingController experienceController = TextEditingController();
   final TextEditingController summaryController = TextEditingController();
@@ -39,6 +38,10 @@ class CVFormController extends GetxController {
     addressController.dispose();
     educationController.dispose();
     linkedinController.dispose();
+    skillsController.dispose();
+    experienceController.dispose();
+    summaryController.dispose();
+    certificationsController.dispose();
     super.onClose();
   }
 }
